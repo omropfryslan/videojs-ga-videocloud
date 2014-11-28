@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2014-06-06
+* videojs-ga - v0.4.1 - 2014-11-28
 * Copyright (c) 2014 Michael Bensoussan
 * Licensed MIT
 */
@@ -7,10 +7,11 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var dataSetupOptions, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, volumeChange;
+    var dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, tracker, volumeChange;
     if (options == null) {
       options = {};
     }
+    player = this;
     dataSetupOptions = {};
     if (this.options()["data-setup"]) {
       parsedOptions = JSON.parse(this.options()["data-setup"]);
@@ -21,14 +22,43 @@
     defaultsEventsToTrack = ['loaded', 'percentsPlayed', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volumeChange', 'error', 'fullscreen'];
     eventsToTrack = options.eventsToTrack || dataSetupOptions.eventsToTrack || defaultsEventsToTrack;
     percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10;
-    eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Video';
-    eventLabel = options.eventLabel || dataSetupOptions.eventLabel;
+    eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player';
+    defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
     percentsAlreadyTracked = [];
     seekStart = seekEnd = 0;
     seeking = false;
+    eventLabel = '';
+    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net') {
+      tracker = options.tracker || dataSetupOptions.tracker;
+      if (tracker) {
+        (function(i, s, o, g, r, a, m) {
+          i["GoogleAnalyticsObject"] = r;
+          i[r] = i[r] || function() {
+            return (i[r].q = i[r].q || []).push(arguments);
+          };
+          i[r].l = 1 * new Date();
+          a = s.createElement(o);
+          m = s.getElementsByTagName(o)[0];
+          a.async = 1;
+          a.src = g;
+          return m.parentNode.insertBefore(a, m);
+        })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
+        ga('create', tracker, 'auto');
+        if (self === top) {
+          ga('set', 'page', document.referrer);
+        }
+        ga('require', 'displayfeatures');
+      }
+    }
     loaded = function() {
-      if (!eventLabel) {
-        eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+      if (defaultLabel) {
+        eventLabel = defaultLabel;
+      } else {
+        if (player.mediainfo) {
+          eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+        } else {
+          eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+        }
       }
       if (__indexOf.call(eventsToTrack, "loadedmetadata") >= 0) {
         sendbeacon('loadedmetadata', true);

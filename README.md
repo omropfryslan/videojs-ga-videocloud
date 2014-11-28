@@ -1,23 +1,25 @@
-# videojs-ga
+# videojs-ga-videocloud
 
-Google Analytics plugin for video.js
+Google Analytics plugin for the next generation Brightcove player. Forked from the video.js plugin [videojs.ga](https://github.com/mickey/videojs-ga).
+
+There are two main changes:
+
+- The video ID and name are read from the player and tracked as the label
+- If the player is in an iframe embed or loaded directly on (preview-)players.brightcove.net *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page as with the original videojs-ga
 
 ## Getting Started
-Download [videojs](http://www.videojs.com/) and [videojs.ga](https://github.com/mickey/videojs-ga)
+Download the plugin
 
-In your web page:
-```html
-<video id="video" src="movie.mp4" controls></video>
-<script src="video.js"></script>
-<script src="dist/videojs.ga.min.js"></script>
-<script>
-videojs('video', {}, function() {
-  this.ga(); // "load the plugin, by defaults tracks everything!!"
-});
-</script>
+Add the URL to the plugin to the player configuration. Add a JSON setting with the name `ga`.
+
+If you want this to work in the in-page embed, this is enough, but you must ensure that Google Analytics is loaded on the page **before** the player.
+
+If you want this to work in the iframe embed or direct player link, you need to add the tracker to the plugin configuration:
+
+```{
+    "tracker": "UA-1234567-8"
+}
 ```
-
-_Please note that the Google Analytics script must be loaded before the ga plugin_
 
 ## Options
 
@@ -40,13 +42,13 @@ The following options are supported:
 ####eventCategory
 
 This is the ```category``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
-**default:** ```'Video'```
+**default:** ```'Brightcove Player'```
 
 
 ####eventLabel
 
 This is the ```label``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
-**default:** basename of the video path so if the path is ```http://s3.amazonaws.com/pouet.mp4``` the label would be ```pouet```
+**default:** `VIDEO_ID | VIDEO_NAME`, then basename of the video path so if the path is ```http://s3.amazonaws.com/pouet.mp4``` the label would be ```pouet```
 
 ####eventsToTrack
 

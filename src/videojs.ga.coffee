@@ -7,6 +7,9 @@
 ##
 
 videojs.plugin 'ga', (options = {}) ->
+
+  player = @
+
   # this loads options from the data-setup attribute of the video tag
   dataSetupOptions = {}
   if @options()["data-setup"]
@@ -21,18 +24,47 @@ videojs.plugin 'ga', (options = {}) ->
   eventsToTrack = options.eventsToTrack || dataSetupOptions.eventsToTrack || defaultsEventsToTrack
   percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10
 
-  eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Video'
+  eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player'
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
-  eventLabel = options.eventLabel || dataSetupOptions.eventLabel
+  defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
 
   # init a few variables
   percentsAlreadyTracked = []
   seekStart = seekEnd = 0
   seeking = false
+  eventLabel = ''
+
+  # load ga script if in iframe and tracker option is set
+  if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net'
+    tracker = options.tracker || dataSetupOptions.tracker
+    if tracker
+      ((i, s, o, g, r, a, m) ->
+        i["GoogleAnalyticsObject"] = r
+        i[r] = i[r] or ->
+          (i[r].q = i[r].q or []).push arguments
+
+        i[r].l = 1 * new Date()
+
+        a = s.createElement(o)
+        m = s.getElementsByTagName(o)[0]
+
+        a.async = 1
+        a.src = g
+        m.parentNode.insertBefore a, m
+      ) window, document, "script", "//www.google-analytics.com/analytics.js", "ga"
+      ga('create', tracker, 'auto')
+      if self == top
+        ga('set', 'page', document.referrer);
+      ga('require', 'displayfeatures'); 
 
   loaded = ->
-    unless eventLabel
-      eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
+    if defaultLabel
+      eventLabel = defaultLabel
+    else
+      if player.mediainfo
+        eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+      else
+        eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
 
     if "loadedmetadata" in eventsToTrack
       sendbeacon( 'loadedmetadata', true )
@@ -123,7 +155,7 @@ videojs.plugin 'ga', (options = {}) ->
     return
 
   @ready ->
-    @on("loadedmetadata", loaded)
+    @on("loadedmetadata", loaded) # use loadstart?
     @on("timeupdate", timeupdate)
     @on("ended", end) if "end" in eventsToTrack
     @on("play", play) if "play" in eventsToTrack
