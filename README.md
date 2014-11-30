@@ -40,12 +40,23 @@ The plugin will take in priority options provided in the javascript, followed by
 
 The following options are supported:
 
+####tracker
+
+If set, this tracker code will be used for iframe embeds and the direct player URL. This is not used for in-page embeds
+
+**default:** Not set
+
+####sendPageView
+
+If true, a page view will be tracked for  iframe embeds and the direct player URL.
+
+**default:** `false`
+
 ####eventCategory
 
 This is the ```category``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
 
 **default:** ```'Brightcove Player'```
-
 
 ####eventLabel
 

@@ -28,6 +28,8 @@ videojs.plugin 'ga', (options = {}) ->
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
 
+  sendPageView = options.sendPageView || dataSetupOptions.sendPageView || false
+
   # init a few variables
   percentsAlreadyTracked = []
   seekStart = seekEnd = 0
@@ -53,9 +55,19 @@ videojs.plugin 'ga', (options = {}) ->
         m.parentNode.insertBefore a, m
       ) window, document, "script", "//www.google-analytics.com/analytics.js", "ga"
       ga('create', tracker, 'auto')
-      if self == top
-        ga('set', 'page', document.referrer);
-      ga('require', 'displayfeatures'); 
+      ga('require', 'displayfeatures');
+
+      if sendPageView
+        # Send pageview for iframe
+        unless self == top
+          ga('send', 'pageview', {
+            'title': ' iframe: ' + document.referrer
+          });
+        # Send pageview for direct player url
+        else
+          ga('send', 'pageview');
+
+
 
   loaded = ->
     if defaultLabel

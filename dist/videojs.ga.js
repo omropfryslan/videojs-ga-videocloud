@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2014-11-28
+* videojs-ga - v0.4.1 - 2014-11-30
 * Copyright (c) 2014 Michael Bensoussan
 * Licensed MIT
 */
@@ -7,7 +7,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, tracker, volumeChange;
+    var dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendPageView, sendbeacon, timeupdate, tracker, volumeChange;
     if (options == null) {
       options = {};
     }
@@ -24,6 +24,7 @@
     percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10;
     eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player';
     defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
+    sendPageView = options.sendPageView || dataSetupOptions.sendPageView || false;
     percentsAlreadyTracked = [];
     seekStart = seekEnd = 0;
     seeking = false;
@@ -44,10 +45,16 @@
           return m.parentNode.insertBefore(a, m);
         })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
         ga('create', tracker, 'auto');
-        if (self === top) {
-          ga('set', 'page', document.referrer);
-        }
         ga('require', 'displayfeatures');
+        if (sendPageView) {
+          if (self !== top) {
+            ga('send', 'pageview', {
+              'title': ' iframe: ' + document.referrer
+            });
+          } else {
+            ga('send', 'pageview');
+          }
+        }
       }
     }
     loaded = function() {
