@@ -8,6 +8,8 @@
 
 videojs.plugin 'ga', (options = {}) ->
 
+  console.log 7
+
   player = @
 
   # this loads options from the data-setup attribute of the video tag
@@ -17,7 +19,7 @@ videojs.plugin 'ga', (options = {}) ->
     dataSetupOptions = parsedOptions.ga if parsedOptions.ga
 
   defaultsEventsToTrack = [
-    'loaded', 'percentsPlayed', 'start',
+    'playerLoad', 'loaded', 'percentsPlayed', 'start',
     'end', 'seek', 'play', 'pause', 'resize',
     'volumeChange', 'error', 'fullscreen'
   ]
@@ -28,13 +30,39 @@ videojs.plugin 'ga', (options = {}) ->
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
 
-  sendPageView = options.sendPageView || dataSetupOptions.sendPageView || false
-
   # init a few variables
   percentsAlreadyTracked = []
+  startTracked = false
+  endTracked = false
   seekStart = seekEnd = 0
   seeking = false
   eventLabel = ''
+
+  eventNames = {
+    "loadedmetadata": "Video Load",
+    "percent played": "Percent played",
+    "start": "Media Begin",
+    "seek start": "Seek start",
+    "seek end": "Seek end",
+    "play": "Media Play",
+    "pause": "Media Pause",
+    "error": "Error",
+    "exit fullscreen": "Fullscreen entered",
+    "enter fullscreen": "Fullscreen exited",
+    "resize": "Resize",
+    "volume change": "Volume Change",
+    "player load": "Player Load",
+    "end": "Media Complete"
+  }
+
+  getEventName = ( name ) ->
+    if options.eventNames && options.eventNames[name]
+      return options.eventNames[name]
+    if dataSetupOptions.eventNames && dataSetupOptions.eventNames[name]
+      return dataSetupOptions.eventNames[name]
+    if eventNames[name]
+      return eventNames[name]
+    return name
 
   # load ga script if in iframe and tracker option is set
   if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net'
@@ -57,18 +85,6 @@ videojs.plugin 'ga', (options = {}) ->
       ga('create', tracker, 'auto')
       ga('require', 'displayfeatures');
 
-      if sendPageView
-        # Send pageview for iframe
-        unless self == top
-          ga('send', 'pageview', {
-            'title': ' iframe: ' + document.referrer
-          });
-        # Send pageview for direct player url
-        else
-          ga('send', 'pageview');
-
-
-
   loaded = ->
     if defaultLabel
       eventLabel = defaultLabel
@@ -79,7 +95,7 @@ videojs.plugin 'ga', (options = {}) ->
         eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
 
     if "loadedmetadata" in eventsToTrack
-      sendbeacon( 'loadedmetadata', true )
+      sendbeacon( getEventName('loadedmetadata'), true )
 
     return
 
@@ -91,10 +107,8 @@ videojs.plugin 'ga', (options = {}) ->
     for percent in [0..99] by percentsPlayedInterval
       if percentPlayed >= percent && percent not in percentsAlreadyTracked
 
-        if "start" in eventsToTrack && percent == 0 && percentPlayed > 0
-          sendbeacon( 'start', true )
-        else if "percentsPlayed" in eventsToTrack && percentPlayed != 0
-          sendbeacon( 'percent played', true, percent )
+        if "percentsPlayed" in eventsToTrack && percentPlayed != 0
+          sendbeacon( getEventName('percent played'), true, percent )
 
         if percentPlayed > 0
           percentsAlreadyTracked.push(percent)
@@ -105,50 +119,55 @@ videojs.plugin 'ga', (options = {}) ->
       # if the difference between the start and the end are greater than 1 it's a seek.
       if Math.abs(seekStart - seekEnd) > 1
         seeking = true
-        sendbeacon( 'seek start', false, seekStart )
-        sendbeacon( 'seek end', false, seekEnd )
+        sendbeacon( getEventName('seek start'), false, seekStart )
+        sendbeacon( getEventName('seek end'), false, seekEnd )
 
     return
 
   end = ->
-    sendbeacon( 'end', true )
+    if !endTracked
+      sendbeacon( 'end', true )
+      endTracked = true
     return
 
   play = ->
     currentTime = Math.round(@currentTime())
-    sendbeacon( 'play', true, currentTime )
+    sendbeacon( getEventName('play'), true, currentTime )
     seeking = false
+    if "start" in eventsToTrack && !startTracked
+      sendbeacon( getEventName('start'), true )
+      startTracked = true
     return
 
   pause = ->
     currentTime = Math.round(@currentTime())
     duration = Math.round(@duration())
     if currentTime != duration && !seeking
-      sendbeacon( 'pause', false, currentTime )
+      sendbeacon( getEventName('pause'), false, currentTime )
     return
 
   # value between 0 (muted) and 1
   volumeChange = ->
     volume = if @muted() == true then 0 else @volume()
-    sendbeacon( 'volume change', false, volume )
+    sendbeacon( getEventName('volume change'), false, volume )
     return
 
   resize = ->
-    sendbeacon( 'resize - ' + @width() + "*" + @height(), true )
+    sendbeacon( getEventName('resize') + ' - ' + @width() + "*" + @height(), true )
     return
 
   error = ->
     currentTime = Math.round(@currentTime())
     # XXX: Is there some informations about the error somewhere ?
-    sendbeacon( 'error', true, currentTime )
+    sendbeacon( getEventName('error'), true, currentTime )
     return
 
   fullscreen = ->
     currentTime = Math.round(@currentTime())
     if @isFullscreen?() || @isFullScreen?()
-      sendbeacon( 'enter fullscreen', false, currentTime )
+      sendbeacon( getEventName('enter fullscreen'), false, currentTime )
     else
-      sendbeacon( 'exit fullscreen', false, currentTime )
+      sendbeacon( getEventName('exit fullscreen'), false, currentTime )
     return
 
   sendbeacon = ( action, nonInteraction, value ) ->
@@ -165,6 +184,25 @@ videojs.plugin 'ga', (options = {}) ->
     else
       console.log("Google Analytics not detected")
     return
+
+  if "playerLoad" in eventsToTrack
+    unless self == top
+      href = document.referrer + '(iframe)'
+      iframe = 1
+    else
+      href = window.location.href
+      iframe = 0
+    if window.ga
+      ga 'send', 'event',
+        'eventCategory' 	: eventCategory
+        'eventAction'		  : getEventName('player load')
+        'eventLabel'		  : href
+        'eventValue'      : iframe
+        'nonInteraction'	: false
+    else if window._gaq
+      _gaq.push(['_trackEvent', eventCategory, getEventName('player load'), href, iframe, false])
+    else
+      console.log("Google Analytics not detected")
 
   @ready ->
     @on("loadedmetadata", loaded) # use loadstart?

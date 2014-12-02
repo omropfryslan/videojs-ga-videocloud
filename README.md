@@ -2,10 +2,11 @@
 
 Google Analytics plugin for the next generation Brightcove player. Forked from the video.js plugin [videojs.ga](https://github.com/mickey/videojs-ga).
 
-There are two main changes:
+Main changes:
 
-- The video ID and name are read from the player and tracked as the label
-- If the player is in an iframe embed or loaded directly on (preview-)players.brightcove.net *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
+- The video ID and name are read from the player and tracked as the event label
+- If the player is in an iframe embed or loaded directly on `(preview-)players.brightcove.net` *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
+- Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised.
 
 ## Getting Started
 Download the plugin.
@@ -26,17 +27,15 @@ If you want this to work in the iframe embed or direct player link, you need to 
 
 You can provide options to the plugin either by passing them in the javascript or in the html.
 
-```javascript
-player.ga({
-  'eventsToTrack': ['fullscreen', 'resize']
-});
+```json
+{
+  "tracker": "UA-1341343-7",
+  "eventNames": {
+    "start": "Anfangen",
+    "play": "Abspielen"
+  }
+}
 ```
-
-```html
-<video id="video" src="movie.mp4" controls data-setup='{"ga": {"eventsToTrack": ["error"]}}'></video>
-```
-
-The plugin will take in priority options provided in the javascript, followed by the ones provided in html and finally the defaults.
 
 The following options are supported:
 
@@ -46,11 +45,26 @@ If set, this tracker code will be used for iframe embeds and the direct player U
 
 **default:** Not set
 
-####sendPageView
+####eventNames
 
-If true, a page view will be tracked for  iframe embeds and the direct player URL.
+Override or localise event names used as event actions
 
-**default:** `false`
+**default:** ```{
+  "loadedmetadata": "Video Load",
+  "percent played": "Percent played",
+  "start": "Media Begin",
+  "seek start": "Seek start",
+  "seek end": "Seek end",
+  "play": "Media Play",
+  "pause": "Media Pause",
+  "error": "Error",
+  "exit fullscreen": "Fullscreen Entered",
+  "enter fullscreen": "Fullscreen Exited",
+  "resize": "Resize",
+  "volume change": "Volume Change",
+  "player load": "Player Load",
+  "end": "Media Complete"
+}```
 
 ####eventCategory
 
@@ -72,7 +86,7 @@ I'm open to add some more if you care to provide a good use case or a pull reque
 **default:** every events
   ```[ 'loaded', 'percentsPlayed', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volumeChange', 'error', 'fullscreen']```
 
-Most of the events are selft explanatory, here's the ones that may need more details:
+Most of the events are self explanatory, here's the ones that may need more details:
 
 - ```percentsPlayed```: will send an event every X percents. X being defined by the option ```percentsPlayedInterval```.
 
@@ -90,5 +104,5 @@ If the iframe embed or direct player URL is used, and a tracker is provided, the
 
 ## TODO
 
-- [x] track the engine used (html5/flash) along with the source (ogg, mp4, ...)
-- [ ] track the time to download the video
+- [ ] Support media change 
+- [ ] Support ad events

@@ -17,14 +17,14 @@ module.exports = function(grunt) {
     coffee: {
       compile: {
         files: {
-          'dist/videojs.ga.js': 'src/videojs.ga.coffee',
+          'dist/videojs.ga.videocloud.js': 'src/videojs.ga.coffee',
         }
       }
     },
     uglify: {
       dist: {
-        src: 'dist/videojs.ga.js',
-        dest: 'dist/videojs.ga.min.js'
+        src: 'dist/videojs.ga.videocloud.js',
+        dest: 'dist/videojs.ga.videocloud.min.js'
       },
     },
     usebanner: {
