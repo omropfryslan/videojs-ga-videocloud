@@ -29,7 +29,7 @@ You can provide options to the plugin either by passing them in the javascript o
 
 ```json
 {
-  "tracker": "UA-1341343-7",
+  "tracker": "UA-1234567-8",
   "eventNames": {
     "start": "Anfangen",
     "play": "Abspielen"
@@ -104,5 +104,5 @@ If the iframe embed or direct player URL is used, and a tracker is provided, the
 
 ## TODO
 
-- [ ] Support media change 
+- [ ] Support media change
 - [ ] Support ad events
