@@ -47,8 +47,8 @@ videojs.plugin 'ga', (options = {}) ->
     "play": "Media Play",
     "pause": "Media Pause",
     "error": "Error",
-    "exit fullscreen": "Fullscreen entered",
-    "enter fullscreen": "Fullscreen exited",
+    "exit fullscreen": "Fullscreen Exited",
+    "enter fullscreen": "Fullscreen Entered",
     "resize": "Resize",
     "volume change": "Volume Change",
     "player load": "Player Load",
@@ -85,66 +85,78 @@ videojs.plugin 'ga', (options = {}) ->
       ga('create', tracker, 'auto')
       ga('require', 'displayfeatures');
 
+  # get ad state of player
+  adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/
+  isInAdState = ( player ) =>
+      return adStateRegex.test( player.el().className )
+
   loaded = ->
-    if defaultLabel
-      eventLabel = defaultLabel
-    else
-      if player.mediainfo
-        eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+    if !isInAdState( player )
+      if defaultLabel
+        eventLabel = defaultLabel
       else
-        eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
+        if player.mediainfo
+          eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+        else
+          eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
 
-    if "loadedmetadata" in eventsToTrack
-      sendbeacon( getEventName('loadedmetadata'), true )
+      if "loadedmetadata" in eventsToTrack
+        sendbeacon( getEventName('loadedmetadata'), true )
 
-    return
+      return
 
   timeupdate = ->
-    currentTime = Math.round(@currentTime())
-    duration = Math.round(@duration())
-    percentPlayed = Math.round(currentTime/duration*100)
+    if !isInAdState( player )
+      currentTime = Math.round(@currentTime())
+      duration = Math.round(@duration())
+      percentPlayed = Math.round(currentTime/duration*100)
 
-    for percent in [0..99] by percentsPlayedInterval
-      if percentPlayed >= percent && percent not in percentsAlreadyTracked
+      for percent in [0..99] by percentsPlayedInterval
+        if percentPlayed >= percent && percent not in percentsAlreadyTracked
 
-        if "percentsPlayed" in eventsToTrack && percentPlayed != 0
-          sendbeacon( getEventName('percent played'), true, percent )
+          if "percentsPlayed" in eventsToTrack && percentPlayed != 0
+            sendbeacon( getEventName('percent played'), true, percent )
 
-        if percentPlayed > 0
-          percentsAlreadyTracked.push(percent)
+          if percentPlayed > 0
+            percentsAlreadyTracked.push(percent)
 
-    if "seek" in eventsToTrack
-      seekStart = seekEnd
-      seekEnd = currentTime
-      # if the difference between the start and the end are greater than 1 it's a seek.
-      if Math.abs(seekStart - seekEnd) > 1
-        seeking = true
-        sendbeacon( getEventName('seek start'), false, seekStart )
-        sendbeacon( getEventName('seek end'), false, seekEnd )
+      if "seek" in eventsToTrack
+        seekStart = seekEnd
+        seekEnd = currentTime
+        # if the difference between the start and the end are greater than 1 it's a seek.
+        if Math.abs(seekStart - seekEnd) > 1
+          seeking = true
+          sendbeacon( getEventName('seek start'), false, seekStart )
+          sendbeacon( getEventName('seek end'), false, seekEnd )
 
-    return
+      return
 
   end = ->
-    if !endTracked
+    if !isInAdState( player ) && !endTracked
       sendbeacon( 'end', true )
       endTracked = true
     return
 
   play = ->
-    currentTime = Math.round(@currentTime())
-    sendbeacon( getEventName('play'), true, currentTime )
-    seeking = false
-    if "start" in eventsToTrack && !startTracked
-      sendbeacon( getEventName('start'), true )
-      startTracked = true
-    return
+    if !isInAdState( player )
+      currentTime = Math.round(@currentTime())
+      sendbeacon( getEventName('play'), true, currentTime )
+      seeking = false
+      return
+
+  start = ->
+    if !isInAdState( player )
+      if "start" in eventsToTrack && !startTracked
+        sendbeacon( getEventName('start'), true )
+        startTracked = true
 
   pause = ->
-    currentTime = Math.round(@currentTime())
-    duration = Math.round(@duration())
-    if currentTime != duration && !seeking
-      sendbeacon( getEventName('pause'), false, currentTime )
-    return
+    if !isInAdState( player )
+      currentTime = Math.round(@currentTime())
+      duration = Math.round(@duration())
+      if currentTime != duration && !seeking
+        sendbeacon( getEventName('pause'), false, currentTime )
+      return
 
   # value between 0 (muted) and 1
   volumeChange = ->
@@ -209,6 +221,7 @@ videojs.plugin 'ga', (options = {}) ->
     @on("timeupdate", timeupdate)
     @on("ended", end) if "end" in eventsToTrack
     @on("play", play) if "play" in eventsToTrack
+    @on("playing", start) if "start" in eventsToTrack
     @on("pause", pause) if "pause" in eventsToTrack
     @on("volumechange", volumeChange) if "volumeChange" in eventsToTrack
     @on("resize", resize) if "resize" in eventsToTrack

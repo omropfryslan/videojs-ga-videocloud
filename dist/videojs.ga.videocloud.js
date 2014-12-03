@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2014-12-02
+* videojs-ga - v0.4.1 - 2014-12-03
 * Copyright (c) 2014 Michael Bensoussan
 * Licensed MIT
 */
@@ -7,7 +7,8 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, startTracked, timeupdate, tracker, volumeChange;
+    var adStateRegex, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, start, startTracked, timeupdate, tracker, volumeChange,
+      _this = this;
     if (options == null) {
       options = {};
     }
@@ -40,8 +41,8 @@
       "play": "Media Play",
       "pause": "Media Pause",
       "error": "Error",
-      "exit fullscreen": "Fullscreen entered",
-      "enter fullscreen": "Fullscreen exited",
+      "exit fullscreen": "Fullscreen Exited",
+      "enter fullscreen": "Fullscreen Entered",
       "resize": "Resize",
       "volume change": "Volume Change",
       "player load": "Player Load",
@@ -78,67 +79,83 @@
         ga('require', 'displayfeatures');
       }
     }
+    adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/;
+    isInAdState = function(player) {
+      return adStateRegex.test(player.el().className);
+    };
     loaded = function() {
-      if (defaultLabel) {
-        eventLabel = defaultLabel;
-      } else {
-        if (player.mediainfo) {
-          eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+      if (!isInAdState(player)) {
+        if (defaultLabel) {
+          eventLabel = defaultLabel;
         } else {
-          eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+          if (player.mediainfo) {
+            eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+          } else {
+            eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+          }
         }
-      }
-      if (__indexOf.call(eventsToTrack, "loadedmetadata") >= 0) {
-        sendbeacon(getEventName('loadedmetadata'), true);
+        if (__indexOf.call(eventsToTrack, "loadedmetadata") >= 0) {
+          sendbeacon(getEventName('loadedmetadata'), true);
+        }
       }
     };
     timeupdate = function() {
       var currentTime, duration, percent, percentPlayed, _i;
-      currentTime = Math.round(this.currentTime());
-      duration = Math.round(this.duration());
-      percentPlayed = Math.round(currentTime / duration * 100);
-      for (percent = _i = 0; _i <= 99; percent = _i += percentsPlayedInterval) {
-        if (percentPlayed >= percent && __indexOf.call(percentsAlreadyTracked, percent) < 0) {
-          if (__indexOf.call(eventsToTrack, "percentsPlayed") >= 0 && percentPlayed !== 0) {
-            sendbeacon(getEventName('percent played'), true, percent);
-          }
-          if (percentPlayed > 0) {
-            percentsAlreadyTracked.push(percent);
+      if (!isInAdState(player)) {
+        currentTime = Math.round(this.currentTime());
+        duration = Math.round(this.duration());
+        percentPlayed = Math.round(currentTime / duration * 100);
+        for (percent = _i = 0; _i <= 99; percent = _i += percentsPlayedInterval) {
+          if (percentPlayed >= percent && __indexOf.call(percentsAlreadyTracked, percent) < 0) {
+            if (__indexOf.call(eventsToTrack, "percentsPlayed") >= 0 && percentPlayed !== 0) {
+              sendbeacon(getEventName('percent played'), true, percent);
+            }
+            if (percentPlayed > 0) {
+              percentsAlreadyTracked.push(percent);
+            }
           }
         }
-      }
-      if (__indexOf.call(eventsToTrack, "seek") >= 0) {
-        seekStart = seekEnd;
-        seekEnd = currentTime;
-        if (Math.abs(seekStart - seekEnd) > 1) {
-          seeking = true;
-          sendbeacon(getEventName('seek start'), false, seekStart);
-          sendbeacon(getEventName('seek end'), false, seekEnd);
+        if (__indexOf.call(eventsToTrack, "seek") >= 0) {
+          seekStart = seekEnd;
+          seekEnd = currentTime;
+          if (Math.abs(seekStart - seekEnd) > 1) {
+            seeking = true;
+            sendbeacon(getEventName('seek start'), false, seekStart);
+            sendbeacon(getEventName('seek end'), false, seekEnd);
+          }
         }
       }
     };
     end = function() {
-      if (!endTracked) {
+      if (!isInAdState(player) && !endTracked) {
         sendbeacon('end', true);
         endTracked = true;
       }
     };
     play = function() {
       var currentTime;
-      currentTime = Math.round(this.currentTime());
-      sendbeacon(getEventName('play'), true, currentTime);
-      seeking = false;
-      if (__indexOf.call(eventsToTrack, "start") >= 0 && !startTracked) {
-        sendbeacon(getEventName('start'), true);
-        startTracked = true;
+      if (!isInAdState(player)) {
+        currentTime = Math.round(this.currentTime());
+        sendbeacon(getEventName('play'), true, currentTime);
+        seeking = false;
+      }
+    };
+    start = function() {
+      if (!isInAdState(player)) {
+        if (__indexOf.call(eventsToTrack, "start") >= 0 && !startTracked) {
+          sendbeacon(getEventName('start'), true);
+          return startTracked = true;
+        }
       }
     };
     pause = function() {
       var currentTime, duration;
-      currentTime = Math.round(this.currentTime());
-      duration = Math.round(this.duration());
-      if (currentTime !== duration && !seeking) {
-        sendbeacon(getEventName('pause'), false, currentTime);
+      if (!isInAdState(player)) {
+        currentTime = Math.round(this.currentTime());
+        duration = Math.round(this.duration());
+        if (currentTime !== duration && !seeking) {
+          sendbeacon(getEventName('pause'), false, currentTime);
+        }
       }
     };
     volumeChange = function() {
@@ -208,6 +225,9 @@
       }
       if (__indexOf.call(eventsToTrack, "play") >= 0) {
         this.on("play", play);
+      }
+      if (__indexOf.call(eventsToTrack, "start") >= 0) {
+        this.on("playing", start);
       }
       if (__indexOf.call(eventsToTrack, "pause") >= 0) {
         this.on("pause", pause);
