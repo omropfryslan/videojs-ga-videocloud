@@ -6,7 +6,7 @@ Main changes:
 
 - The video ID and name are read from the player and tracked as the event label
 - If the player is in an iframe embed or loaded directly on `(preview-)players.brightcove.net` *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
-- Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised.
+- Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised with plugin options.
 
 ## Getting Started
 Download the plugin.
@@ -31,8 +31,7 @@ You can provide options to the plugin either by passing them in the javascript o
 {
   "tracker": "UA-1234567-8",
   "eventNames": {
-    "start": "Anfangen",
-    "play": "Abspielen"
+    "play": "Wiedergabe"
   }
 }
 ```
@@ -50,19 +49,19 @@ If set, this tracker code will be used for iframe embeds and the direct player U
 Override or localise event names used as event actions
 
 **default:** ```{
-  "loadedmetadata": "Video Load",
-  "percent played": "Percent played",
+  "video_load": "Video Load",
+  "percent_played": "Percent played",
   "start": "Media Begin",
-  "seek start": "Seek start",
-  "seek end": "Seek end",
+  "seek_start": "Seek start",
+  "seek_end": "Seek end",
   "play": "Media Play",
   "pause": "Media Pause",
   "error": "Error",
-  "exit fullscreen": "Fullscreen Entered",
-  "enter fullscreen": "Fullscreen Exited",
+  "fullscreen_exit": "Fullscreen Entered",
+  "fullscreen_exit": "Fullscreen Exited",
   "resize": "Resize",
-  "volume change": "Volume Change",
-  "player load": "Player Load",
+  "volume_change": "Volume Change",
+  "player_load": "Player Load",
   "end": "Media Complete"
 }```
 
@@ -84,7 +83,7 @@ The events you want to track. Most of this events are videojs events. Some of th
 I'm open to add some more if you care to provide a good use case or a pull request.
 
 **default:** every events
-  ```[ 'loaded', 'percentsPlayed', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volumeChange', 'error', 'fullscreen']```
+  ```[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']```
 
 Most of the events are self explanatory, here's the ones that may need more details:
 

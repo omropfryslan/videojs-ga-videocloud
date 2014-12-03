@@ -21,7 +21,7 @@
         dataSetupOptions = parsedOptions.ga;
       }
     }
-    defaultsEventsToTrack = ['playerLoad', 'loaded', 'percentsPlayed', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volumeChange', 'error', 'fullscreen'];
+    defaultsEventsToTrack = ['player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen'];
     eventsToTrack = options.eventsToTrack || dataSetupOptions.eventsToTrack || defaultsEventsToTrack;
     percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10;
     eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player';
@@ -33,19 +33,19 @@
     seeking = false;
     eventLabel = '';
     eventNames = {
-      "loadedmetadata": "Video Load",
-      "percent played": "Percent played",
+      "video_load": "Video Load",
+      "percent_played": "Percent played",
       "start": "Media Begin",
-      "seek start": "Seek start",
-      "seek end": "Seek end",
+      "seek_start": "Seek start",
+      "seek_end": "Seek end",
       "play": "Media Play",
       "pause": "Media Pause",
       "error": "Error",
-      "exit fullscreen": "Fullscreen Exited",
-      "enter fullscreen": "Fullscreen Entered",
+      "fullscreen_exit": "Fullscreen Exited",
+      "fullscreen_enter": "Fullscreen Entered",
       "resize": "Resize",
-      "volume change": "Volume Change",
-      "player load": "Player Load",
+      "volume_change": "Volume Change",
+      "player_load": "Player Load",
       "end": "Media Complete"
     };
     getEventName = function(name) {
@@ -94,8 +94,8 @@
             eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
           }
         }
-        if (__indexOf.call(eventsToTrack, "loadedmetadata") >= 0) {
-          sendbeacon(getEventName('loadedmetadata'), true);
+        if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
+          sendbeacon(getEventName('player_load'), true);
         }
       }
     };
@@ -108,7 +108,7 @@
         for (percent = _i = 0; _i <= 99; percent = _i += percentsPlayedInterval) {
           if (percentPlayed >= percent && __indexOf.call(percentsAlreadyTracked, percent) < 0) {
             if (__indexOf.call(eventsToTrack, "percentsPlayed") >= 0 && percentPlayed !== 0) {
-              sendbeacon(getEventName('percent played'), true, percent);
+              sendbeacon(getEventName('percent_played'), true, percent);
             }
             if (percentPlayed > 0) {
               percentsAlreadyTracked.push(percent);
@@ -120,8 +120,8 @@
           seekEnd = currentTime;
           if (Math.abs(seekStart - seekEnd) > 1) {
             seeking = true;
-            sendbeacon(getEventName('seek start'), false, seekStart);
-            sendbeacon(getEventName('seek end'), false, seekEnd);
+            sendbeacon(getEventName('seek_start'), false, seekStart);
+            sendbeacon(getEventName('seek_end'), false, seekEnd);
           }
         }
       }
@@ -161,7 +161,7 @@
     volumeChange = function() {
       var volume;
       volume = this.muted() === true ? 0 : this.volume();
-      sendbeacon(getEventName('volume change'), false, volume);
+      sendbeacon(getEventName('volume_change'), false, volume);
     };
     resize = function() {
       sendbeacon(getEventName('resize') + ' - ' + this.width() + "*" + this.height(), true);
@@ -175,9 +175,9 @@
       var currentTime;
       currentTime = Math.round(this.currentTime());
       if ((typeof this.isFullscreen === "function" ? this.isFullscreen() : void 0) || (typeof this.isFullScreen === "function" ? this.isFullScreen() : void 0)) {
-        sendbeacon(getEventName('enter fullscreen'), false, currentTime);
+        sendbeacon(getEventName('fullscreen_enter'), false, currentTime);
       } else {
-        sendbeacon(getEventName('exit fullscreen'), false, currentTime);
+        sendbeacon(getEventName('fullscreen_enter'), false, currentTime);
       }
     };
     sendbeacon = function(action, nonInteraction, value) {
@@ -195,7 +195,7 @@
         console.log("Google Analytics not detected");
       }
     };
-    if (__indexOf.call(eventsToTrack, "playerLoad") >= 0) {
+    if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
       if (self !== top) {
         href = document.referrer + '(iframe)';
         iframe = 1;
@@ -206,13 +206,13 @@
       if (window.ga) {
         ga('send', 'event', {
           'eventCategory': eventCategory,
-          'eventAction': getEventName('player load'),
+          'eventAction': getEventName('player_load'),
           'eventLabel': href,
           'eventValue': iframe,
           'nonInteraction': false
         });
       } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, getEventName('player load'), href, iframe, false]);
+        _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
       } else {
         console.log("Google Analytics not detected");
       }
@@ -232,7 +232,7 @@
       if (__indexOf.call(eventsToTrack, "pause") >= 0) {
         this.on("pause", pause);
       }
-      if (__indexOf.call(eventsToTrack, "volumeChange") >= 0) {
+      if (__indexOf.call(eventsToTrack, "volume_change") >= 0) {
         this.on("volumechange", volumeChange);
       }
       if (__indexOf.call(eventsToTrack, "resize") >= 0) {
