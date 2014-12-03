@@ -7,7 +7,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var adStateRegex, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, start, startTracked, timeupdate, tracker, volumeChange,
+    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, resize, seekEnd, seekStart, seeking, sendbeacon, start, startTracked, timeupdate, tracker, volumeChange,
       _this = this;
     if (options == null) {
       options = {};
@@ -32,6 +32,7 @@
     seekStart = seekEnd = 0;
     seeking = false;
     eventLabel = '';
+    currentVideo = '';
     eventNames = {
       "video_load": "Video Load",
       "percent_played": "Percent played",
@@ -85,17 +86,25 @@
     };
     loaded = function() {
       if (!isInAdState(player)) {
-        if (defaultLabel) {
-          eventLabel = defaultLabel;
-        } else {
-          if (player.mediainfo) {
-            eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+        if (player.mediainfo.id && player.mediainfo.id !== currentVideo) {
+          currentVideo = player.mediainfo.id;
+          percentsAlreadyTracked = [];
+          startTracked = false;
+          endTracked = false;
+          seekStart = seekEnd = 0;
+          seeking = false;
+          if (defaultLabel) {
+            eventLabel = defaultLabel;
           } else {
-            eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+            if (player.mediainfo) {
+              eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+            } else {
+              eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+            }
           }
-        }
-        if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
-          sendbeacon(getEventName('player_load'), true);
+          if (__indexOf.call(eventsToTrack, "video_load") >= 0) {
+            sendbeacon(getEventName('video_load'), true);
+          }
         }
       }
     };

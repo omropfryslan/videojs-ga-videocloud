@@ -37,6 +37,7 @@ videojs.plugin 'ga', (options = {}) ->
   seekStart = seekEnd = 0
   seeking = false
   eventLabel = ''
+  currentVideo = ''
 
   eventNames = {
     "video_load": "Video Load",
@@ -88,22 +89,27 @@ videojs.plugin 'ga', (options = {}) ->
   # get ad state of player
   adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/
   isInAdState = ( player ) =>
-      return adStateRegex.test( player.el().className )
+    return adStateRegex.test( player.el().className )
 
   loaded = ->
     if !isInAdState( player )
-      if defaultLabel
-        eventLabel = defaultLabel
-      else
-        if player.mediainfo
-          eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+      if player.mediainfo.id && player.mediainfo.id != currentVideo
+        currentVideo = player.mediainfo.id
+        percentsAlreadyTracked = []
+        startTracked = false
+        endTracked = false
+        seekStart = seekEnd = 0
+        seeking = false
+        if defaultLabel
+          eventLabel = defaultLabel
         else
-          eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
+          if player.mediainfo
+            eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+          else
+            eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
 
-      if "player_load" in eventsToTrack
-        sendbeacon( getEventName('player_load'), true )
-
-      # TODO: Change event.
+        if "video_load" in eventsToTrack
+          sendbeacon( getEventName('video_load'), true )
 
       return
 

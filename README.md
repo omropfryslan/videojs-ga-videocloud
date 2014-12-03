@@ -103,5 +103,5 @@ If the iframe embed or direct player URL is used, and a tracker is provided, the
 
 ## TODO
 
-- [ ] Support media change
+- [x] Support media change - "video_load" event
 - [ ] Support ad events
