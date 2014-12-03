@@ -25,7 +25,7 @@ If you want this to work in the iframe embed or direct player link, you need to 
 
 ## Options
 
-You can provide options to the plugin either by passing them in the javascript or in the html.
+Provide options to the plugin in the player configuraiton using `ga` as the name.
 
 ```json
 {
@@ -46,9 +46,11 @@ If set, this tracker code will be used for iframe embeds and the direct player U
 
 ####eventNames
 
-Override or localise event names used as event actions
+Override or localise the names of the event actions.
 
-**default:** ```{
+**default:**
+```
+{
   "video_load": "Video Load",
   "percent_played": "Percent played",
   "start": "Media Begin",
@@ -79,19 +81,20 @@ This is the ```label``` sent to GA. If you don't know what it is please check [G
 
 ####eventsToTrack
 
-The events you want to track. Most of this events are videojs events. Some of them might reflects my needs.
-I'm open to add some more if you care to provide a good use case or a pull request.
+The events you want to track.
 
-**default:** every events
-  ```[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']```
+**default:**
+```[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']```
 
-Most of the events are self explanatory, here's the ones that may need more details:
-
-- ```percentsPlayed```: will send an event every X percents. X being defined by the option ```percentsPlayedInterval```.
+* `player_load` Player has loaded.
+* `video_load` Video has loaded. Will fire again when a new video is loaded.
+* `percent_played` Every *x*% of the video, with the percentage as a value, where *x* is defined by `percentsPlayedInterval`. Default is 10.
+* `start` Playback has started. Once per video load.
+* `end` Playback has completed. Once per video load.
 
 ####percentsPlayedInterval
 
-This options goes with the ```percentsPlayed``` event. Every ```percentsPlayedInterval``` percents an event will be sent to GA.
+This options goes with the ```percents_played``` event. Every ```percentsPlayedInterval``` percents an event will be sent to GA.
 
 **default:** 10
 
