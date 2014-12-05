@@ -65,7 +65,8 @@ Override or localise the names of the event actions.
   "volume_change": "Volume Change",
   "player_load": "Player Load",
   "end": "Media Complete"
-}```
+}
+```
 
 ####eventCategory
 
