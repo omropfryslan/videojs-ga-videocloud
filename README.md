@@ -9,18 +9,27 @@ This plugin was forked from the video.js plugin [videojs.ga](https://github.com/
 - Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised with plugin options.
 
 ## Getting Started
-Download the plugin.
+* Download the plugin and place on your server.
+* Edit the player configuration in the [player studio](https://studio.brightcove.com/products/videocloud/players).
+* Under _Plugins>JavaScript_, add the URL to the plugin to the player configuration and click +.
+* Under _Plugins>Name, Options (JSON)_, enter `ga` as the name and click +.
 
-Add the URL to the plugin to the player configuration. Add a JSON setting with the name `ga`.
+If you want to use the in-page embed only, this is enough, but you must ensure that Google Analytics is loaded on the page **before** the player.
 
-If you want this to work in the in-page embed, this is enough, but you must ensure that Google Analytics is loaded on the page **before** the player.
-
-If you want this to work in the iframe embed or direct player link, you need to add the tracker to the plugin configuration:
+If you want use the iframe embed or direct player link, you need to also add the tracker to the plugin configuration under _Plugins>Name, Options (JSON)_:
 
 ```json
 {
     "tracker": "UA-1234567-8"
 }
+```
+
+### Configuration with the Player Management API
+
+You can configure the plugin with the [player management API](http://docs.brightcove.com/en/video-cloud/player-management/index.html) instead of the GUI studio. For example, to add the plugin to an existing player:
+
+```bash
+curl --header "Content-Type: application/json" --user $EMAIL --request PATCH --data '{"scripts":["http://example.com/videojs.ga.videocloud.js"],"plugins":[{"name":"ga","options":{"tracker":"UA-1234567-8","eventNames":{"play":"Wiedergabe"}}}]}' https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/configuration
 ```
 
 ## Options
