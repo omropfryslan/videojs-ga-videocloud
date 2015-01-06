@@ -1,8 +1,8 @@
 # videojs-ga-videocloud
 
-Google Analytics plugin for the next generation Brightcove player. Forked from the video.js plugin [videojs.ga](https://github.com/mickey/videojs-ga).
+Google Analytics plugin for the next generation Brightcove player. Note this is not compatible with the Brightcove Smart Player which uses a different plugin architecture and API.
 
-Main changes:
+This plugin was forked from the video.js plugin [videojs.ga](https://github.com/mickey/videojs-ga). Main changes from the original:
 
 - The video ID and name are read from the player and tracked as the event label
 - If the player is in an iframe embed or loaded directly on `(preview-)players.brightcove.net` *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
