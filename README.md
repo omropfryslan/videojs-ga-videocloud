@@ -94,14 +94,16 @@ This is the ```category``` sent to GA. If you don't know what it is please check
 
 This is the ```label``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
 
-**default:** `VIDEO_ID | VIDEO_NAME`. If these are unavailable then basename of the video path, so if the path is ```http://example.com/movie.mp4``` the label would be ```movie```
+**default:** `VIDEO_ID | VIDEO_NAME`.
 
 ####eventsToTrack
 
 The events you want to track. For example `start` (playback started for the first time) and `end` are probably more interesting than `play` and `pause`.
 
 **default:**
-```[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']```
+```
+[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']
+```
 
 * `player_load` Player has loaded.
 * `video_load` Video has loaded. Will fire again when a new video is loaded.
