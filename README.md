@@ -33,6 +33,12 @@ You can configure the plugin with the [player management API](http://docs.bright
 curl --header "Content-Type: application/json" --user $EMAIL --request PATCH --data '{"scripts":["http://example.com/videojs.ga.videocloud.js"],"plugins":[{"name":"ga","options":{"tracker":"UA-1234567-8","eventNames":{"play":"Wiedergabe"}}}]}' https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/configuration
 ```
 
+### Classic and Universal Analytics
+
+If the in-page embed is used, this plugin supports the "classic" ga.js and "universal" analytics.js Google Analytics libraries. It autodetects the library you use.
+
+If the iframe embed or direct player URL is used, and a tracker is provided, the "universal" analytics.js is used.
+
 ## Options
 
 Provide options to the plugin in the player configuraiton using `ga` as the name.
@@ -108,12 +114,6 @@ The events you want to track. For example `start` (playback started for the firs
 This options goes with the ```percents_played``` event. Every ```percentsPlayedInterval``` percents an event will be sent to GA.
 
 **default:** 10
-
-#### Classic and Universal
-
-If the in-page embed is used, this plugin supports the "classic" ga.js and "universal" analytics.js Google Analytics libraries. It autodetects the library you use.
-
-If the iframe embed or direct player URL is used, and a tracker is provided, the "universal" analytics.js is used.
 
 ## TODO
 
