@@ -1,6 +1,8 @@
-# videojs-ga-videocloud
+# Google Analytics for Brightcove player
 
-Google Analytics plugin for the next generation Brightcove player. Note this is not compatible with the Brightcove Smart Player which uses a different plugin architecture and API.
+Google Analytics plugin for the next generation Brightcove player.
+
+*Note this is not compatible with the Brightcove Smart Player which uses a different plugin architecture and API.*
 
 This plugin was forked from the open source plugin written for video.js [videojs.ga](https://github.com/mickey/videojs-ga). Main changes from the original:
 
