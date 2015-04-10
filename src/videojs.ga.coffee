@@ -8,7 +8,10 @@
 
 videojs.plugin 'ga', (options = {}) ->
 
-  console.log 7
+  referrer = new URL(document.referrer)
+  if (self != top && window.location.host == 'preview-players.brightcove.net' && referrer.hostname = 'studio.brightcove.com')
+    videojs.log('Google analytics plugin will not track events in Video Cloud Studio')
+    return
 
   player = @
 
@@ -163,7 +166,7 @@ videojs.plugin 'ga', (options = {}) ->
       currentTime = Math.round(@currentTime())
       duration = Math.round(@duration())
       if currentTime != duration && !seeking
-        sendbeacon( getEventName('pause'), false, currentTime )
+        sendbeacon( getEventName('pause'), true, currentTime )
       return
 
   # value between 0 (muted) and 1
@@ -191,7 +194,7 @@ videojs.plugin 'ga', (options = {}) ->
     return
 
   sendbeacon = ( action, nonInteraction, value ) ->
-    # console.log action, " ", nonInteraction, " ", value
+    # videojs.log action, " ", nonInteraction, " ", value
     if window.ga
       ga 'send', 'event',
         'eventCategory' 	: eventCategory
@@ -202,12 +205,12 @@ videojs.plugin 'ga', (options = {}) ->
     else if window._gaq
       _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction])
     else
-      console.log("Google Analytics not detected")
+      videojs.log("Google Analytics not detected")
     return
 
   if "player_load" in eventsToTrack
     unless self == top
-      href = document.referrer + '(iframe)'
+      href = document.referrer
       iframe = 1
     else
       href = window.location.href
@@ -222,7 +225,7 @@ videojs.plugin 'ga', (options = {}) ->
     else if window._gaq
       _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false])
     else
-      console.log("Google Analytics not detected")
+      videojs.log("Google Analytics not detected")
 
   @ready ->
     @on("loadedmetadata", loaded) # use loadstart?
