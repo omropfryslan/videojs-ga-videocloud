@@ -109,11 +109,11 @@ This options goes with the ```percents_played``` event. Every ```percentsPlayedI
 
 **default:** 10
 
-#### ga.js and analytics.js
+#### Classic and Universal
 
-If the in-page embed is used, this plugin supports the ga.js and the newer analytics.js Google Analytics libraries. It autodetects the library you use.
+If the in-page embed is used, this plugin supports the "classic" ga.js and "universal" analytics.js Google Analytics libraries. It autodetects the library you use.
 
-If the iframe embed or direct player URL is used, and a tracker is provided, the "universal" analytics.js is loaded.
+If the iframe embed or direct player URL is used, and a tracker is provided, the "universal" analytics.js is used.
 
 ## TODO
 
