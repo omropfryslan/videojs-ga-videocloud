@@ -222,7 +222,7 @@
           'eventAction': getEventName('player_load'),
           'eventLabel': href,
           'eventValue': iframe,
-          'nonInteraction': false
+          'nonInteraction': true
         });
       } else if (window._gaq) {
         _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
