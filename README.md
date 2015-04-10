@@ -2,19 +2,20 @@
 
 Google Analytics plugin for the next generation Brightcove player. Note this is not compatible with the Brightcove Smart Player which uses a different plugin architecture and API.
 
-This plugin was forked from the video.js plugin [videojs.ga](https://github.com/mickey/videojs-ga). Main changes from the original:
+This plugin was forked from the open source plugin written for video.js [videojs.ga](https://github.com/mickey/videojs-ga). Main changes from the original:
 
 - The video ID and name are read from the player and tracked as the event label
 - If the player is in an iframe embed or loaded directly on `(preview-)players.brightcove.net` *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
 - Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised with plugin options.
+- The plugin will not track events when the player is viewed in the Video Cloud Studio.
 
 ## Getting Started
 * Download the plugin and place on your server.
-* Edit the player configuration in the [player studio](https://studio.brightcove.com/products/videocloud/players).
+* Edit the player configuration in the [Players Module of Video Cloud Studio](https://studio.brightcove.com/products/videocloud/players).
 * Under _Plugins>JavaScript_, add the URL to the plugin to the player configuration and click +.
-* Under _Plugins>Name, Options (JSON)_, enter `ga` as the name and click +.
+* Under _Plugins>Name, Options (JSON)_, enter `ga` as the name and click `+`.
 
-If you want to use the in-page embed only, this is enough, but you must ensure that Google Analytics is loaded on the page **before** the player.
+If you want to use the in-page embed only, this is enough, but **you must ensure that Google Analytics is loaded on the page before the player**.
 
 If you want use the iframe embed or direct player link, you need to also add the tracker to the plugin configuration under _Plugins>Name, Options (JSON)_:
 
@@ -87,11 +88,11 @@ This is the ```category``` sent to GA. If you don't know what it is please check
 
 This is the ```label``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
 
-**default:** `VIDEO_ID | VIDEO_NAME`. If these are unavailable then basename of the video path, so if the path is ```http://s3.amazonaws.com/pouet.mp4``` the label would be ```pouet```
+**default:** `VIDEO_ID | VIDEO_NAME`. If these are unavailable then basename of the video path, so if the path is ```http://example.com/movie.mp4``` the label would be ```movie```
 
 ####eventsToTrack
 
-The events you want to track.
+The events you want to track. For example `start` (playback started for the first time) and `end` are probably more interesting than `play` and `pause`.
 
 **default:**
 ```[ 'player_load', 'video_load', 'percent_played', 'start', 'end', 'seek', 'play', 'pause', 'resize', 'volume_change', 'error', 'fullscreen']```
@@ -118,4 +119,3 @@ If the iframe embed or direct player URL is used, and a tracker is provided, the
 
 - [x] Support media change - "video_load" event
 - [ ] Support ad events
-
