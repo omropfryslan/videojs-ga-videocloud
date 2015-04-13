@@ -96,7 +96,7 @@ videojs.plugin 'ga', (options = {}) ->
 
   loaded = ->
     if !isInAdState( player )
-      if player.mediainfo.id && player.mediainfo.id != currentVideo
+      if player.mediainfo && player.mediainfo.id && player.mediainfo.id != currentVideo
         currentVideo = player.mediainfo.id
         percentsAlreadyTracked = []
         startTracked = false

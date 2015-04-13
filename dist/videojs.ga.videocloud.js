@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2015-04-10
+* videojs-ga - v0.4.1 - 2015-04-13
 * Copyright (c) 2015 Michael Bensoussan
 * Licensed MIT
 */
@@ -90,7 +90,7 @@
     };
     loaded = function() {
       if (!isInAdState(player)) {
-        if (player.mediainfo.id && player.mediainfo.id !== currentVideo) {
+        if (player.mediainfo && player.mediainfo.id && player.mediainfo.id !== currentVideo) {
           currentVideo = player.mediainfo.id;
           percentsAlreadyTracked = [];
           startTracked = false;
