@@ -219,19 +219,21 @@
         href = window.location.href;
         iframe = 0;
       }
-      if (window.ga) {
-        ga('send', 'event', {
-          'eventCategory': eventCategory,
-          'eventAction': getEventName('player_load'),
-          'eventLabel': href,
-          'eventValue': iframe,
-          'nonInteraction': true
-        });
-      } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
-      } else {
-        videojs.log("Google Analytics not detected");
-      }
+    }
+    if (sendbeaconOverride) {
+      sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
+    } else if (window.ga) {
+      ga('send', 'event', {
+        'eventCategory': eventCategory,
+        'eventAction': getEventName('player_load'),
+        'eventLabel': href,
+        'eventValue': iframe,
+        'nonInteraction': true
+      });
+    } else if (window._gaq) {
+      _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
+    } else {
+      videojs.log("Google Analytics not detected");
     }
     this.ready(function() {
       this.on("loadedmetadata", loaded);
