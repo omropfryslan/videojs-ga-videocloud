@@ -220,6 +220,7 @@ videojs.plugin 'ga', (options = {}) ->
     else
       href = window.location.href
       iframe = 0
+      
 		if sendbeaconOverride
       sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
     else if window.ga
