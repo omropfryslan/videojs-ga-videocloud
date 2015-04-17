@@ -32,6 +32,9 @@ videojs.plugin 'ga', (options = {}) ->
   eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player'
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
+	
+	# check if should be using another method for sendbecon
+	sendbeaconOverride = options.sendbeaconOverride || false
 
   # init a few variables
   percentsAlreadyTracked = []
@@ -190,12 +193,14 @@ videojs.plugin 'ga', (options = {}) ->
     if @isFullscreen?() || @isFullScreen?()
       sendbeacon( getEventName('fullscreen_enter'), false, currentTime )
     else
-      sendbeacon( getEventName('fullscreen_enter'), false, currentTime )
+      sendbeacon( getEventName('fullscreen_exit'), false, currentTime )
     return
 
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
-    if window.ga
+		if sendbeaconOverride
+			sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
+    else if window.ga
       ga 'send', 'event',
         'eventCategory' 	: eventCategory
         'eventAction'		  : action
