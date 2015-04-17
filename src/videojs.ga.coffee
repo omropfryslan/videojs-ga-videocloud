@@ -32,10 +32,10 @@ videojs.plugin 'ga', (options = {}) ->
   eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player'
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
+  
+  #override the send beacon method - in our case, we need to do data layer pushes
+  sendbeaconOverride = options.sendbeaconOverride || false
 	
-	# check if should be using another method for sendbecon
-	sendbeaconOverride = options.sendbeaconOverride || false
-
   # init a few variables
   percentsAlreadyTracked = []
   startTracked = false
@@ -199,7 +199,7 @@ videojs.plugin 'ga', (options = {}) ->
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
 		if sendbeaconOverride
-			sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
+      sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
     else if window.ga
       ga 'send', 'event',
         'eventCategory' 	: eventCategory

@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2015-04-13
+* videojs-ga - v0.4.1 - 2015-04-17
 * Copyright (c) 2015 Michael Bensoussan
 * Licensed MIT
 */
@@ -7,7 +7,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, start, startTracked, timeupdate, tracker, volumeChange,
+    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, volumeChange,
       _this = this;
     if (options == null) {
       options = {};
@@ -30,6 +30,7 @@
     percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10;
     eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player';
     defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
+    sendbeaconOverride = options.sendbeaconOverride || false;
     percentsAlreadyTracked = [];
     startTracked = false;
     endTracked = false;
@@ -190,24 +191,26 @@
       if ((typeof this.isFullscreen === "function" ? this.isFullscreen() : void 0) || (typeof this.isFullScreen === "function" ? this.isFullScreen() : void 0)) {
         sendbeacon(getEventName('fullscreen_enter'), false, currentTime);
       } else {
-        sendbeacon(getEventName('fullscreen_enter'), false, currentTime);
+        sendbeacon(getEventName('fullscreen_exit'), false, currentTime);
       }
     };
-    sendbeacon = function(action, nonInteraction, value) {
-      if (window.ga) {
-        ga('send', 'event', {
-          'eventCategory': eventCategory,
-          'eventAction': action,
-          'eventLabel': eventLabel,
-          'eventValue': value,
-          'nonInteraction': nonInteraction
-        });
-      } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
-      } else {
-        videojs.log("Google Analytics not detected");
-      }
-    };
+    sendbeacon = function(action, nonInteraction, value) {};
+    if (sendbeaconOverride) {
+      sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
+    } else if (window.ga) {
+      ga('send', 'event', {
+        'eventCategory': eventCategory,
+        'eventAction': action,
+        'eventLabel': eventLabel,
+        'eventValue': value,
+        'nonInteraction': nonInteraction
+      });
+    } else if (window._gaq) {
+      _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
+    } else {
+      videojs.log("Google Analytics not detected");
+    }
+    return;
     if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
       if (self !== top) {
         href = document.referrer;
