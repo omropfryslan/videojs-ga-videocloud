@@ -121,7 +121,7 @@
         percentPlayed = Math.round(currentTime / duration * 100);
         for (percent = _i = 0; _i <= 99; percent = _i += percentsPlayedInterval) {
           if (percentPlayed >= percent && __indexOf.call(percentsAlreadyTracked, percent) < 0) {
-            if (__indexOf.call(eventsToTrack, "percentsPlayed") >= 0 && percentPlayed !== 0) {
+            if (__indexOf.call(eventsToTrack, "percent_played") >= 0 && percentPlayed !== 0) {
               sendbeacon(getEventName('percent_played'), true, percent);
             }
             if (percentPlayed > 0) {
