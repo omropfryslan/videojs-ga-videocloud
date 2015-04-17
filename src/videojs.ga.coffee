@@ -198,7 +198,7 @@ videojs.plugin 'ga', (options = {}) ->
 
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
-		if sendbeaconOverride
+    if sendbeaconOverride
       sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
     else if window.ga
       ga 'send', 'event',

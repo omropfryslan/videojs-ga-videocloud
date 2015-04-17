@@ -194,23 +194,23 @@
         sendbeacon(getEventName('fullscreen_exit'), false, currentTime);
       }
     };
-    sendbeacon = function(action, nonInteraction, value) {};
-    if (sendbeaconOverride) {
-      sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
-    } else if (window.ga) {
-      ga('send', 'event', {
-        'eventCategory': eventCategory,
-        'eventAction': action,
-        'eventLabel': eventLabel,
-        'eventValue': value,
-        'nonInteraction': nonInteraction
-      });
-    } else if (window._gaq) {
-      _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
-    } else {
-      videojs.log("Google Analytics not detected");
-    }
-    return;
+    sendbeacon = function(action, nonInteraction, value) {
+      if (sendbeaconOverride) {
+        sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
+      } else if (window.ga) {
+        ga('send', 'event', {
+          'eventCategory': eventCategory,
+          'eventAction': action,
+          'eventLabel': eventLabel,
+          'eventValue': value,
+          'nonInteraction': nonInteraction
+        });
+      } else if (window._gaq) {
+        _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
+      } else {
+        videojs.log("Google Analytics not detected");
+      }
+    };
     if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
       if (self !== top) {
         href = document.referrer;
