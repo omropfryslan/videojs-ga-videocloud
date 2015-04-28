@@ -1,5 +1,5 @@
 /*
-* videojs-ga - v0.4.1 - 2015-04-17
+* videojs-ga - v0.4.1 - 2015-04-28
 * Copyright (c) 2015 Michael Bensoussan
 * Licensed MIT
 */
@@ -91,6 +91,15 @@
     };
     loaded = function() {
       if (!isInAdState(player)) {
+        if (defaultLabel) {
+          eventLabel = defaultLabel;
+        } else {
+          if (player.mediainfo && player.mediainfo.id) {
+            eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
+          } else {
+            eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
+          }
+        }
         if (player.mediainfo && player.mediainfo.id && player.mediainfo.id !== currentVideo) {
           currentVideo = player.mediainfo.id;
           percentsAlreadyTracked = [];
@@ -98,15 +107,6 @@
           endTracked = false;
           seekStart = seekEnd = 0;
           seeking = false;
-          if (defaultLabel) {
-            eventLabel = defaultLabel;
-          } else {
-            if (player.mediainfo) {
-              eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name;
-            } else {
-              eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
-            }
-          }
           if (__indexOf.call(eventsToTrack, "video_load") >= 0) {
             sendbeacon(getEventName('video_load'), true);
           }

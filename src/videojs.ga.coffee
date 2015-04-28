@@ -32,10 +32,10 @@ videojs.plugin 'ga', (options = {}) ->
   eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player'
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
-  
+
   #override the send beacon method - in our case, we need to do data layer pushes
   sendbeaconOverride = options.sendbeaconOverride || false
-	
+
   # init a few variables
   percentsAlreadyTracked = []
   startTracked = false
@@ -99,6 +99,14 @@ videojs.plugin 'ga', (options = {}) ->
 
   loaded = ->
     if !isInAdState( player )
+      # Event label is Video Cloud ID | Name, or filename (Perform), or overridden
+      if defaultLabel
+        eventLabel = defaultLabel
+      else
+        if player.mediainfo && player.mediainfo.id
+          eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
+        else
+          eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
       if player.mediainfo && player.mediainfo.id && player.mediainfo.id != currentVideo
         currentVideo = player.mediainfo.id
         percentsAlreadyTracked = []
@@ -106,13 +114,6 @@ videojs.plugin 'ga', (options = {}) ->
         endTracked = false
         seekStart = seekEnd = 0
         seeking = false
-        if defaultLabel
-          eventLabel = defaultLabel
-        else
-          if player.mediainfo
-            eventLabel = player.mediainfo.id + ' | ' + player.mediainfo.name
-          else
-            eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
 
         if "video_load" in eventsToTrack
           sendbeacon( getEventName('video_load'), true )
@@ -220,7 +221,7 @@ videojs.plugin 'ga', (options = {}) ->
     else
       href = window.location.href
       iframe = 0
-      
+
 		if sendbeaconOverride
       sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
     else if window.ga
