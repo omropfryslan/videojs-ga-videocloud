@@ -119,6 +119,15 @@ This options goes with the ```percents_played``` event. Every ```percentsPlayedI
 
 **default:** 10
 
+####sendbeaconOverride
+In the event you want to do something custom for all tracked events, use this option to pass a callback function to the plugin. The callback will have access to the following variables and will **override the plugins native tracking methods**:
+* `eventCategorty`
+* `action`
+* `eventLabel`
+* `value`
+* `nonInteraction`
+
+
 ## TODO
 
 - [x] Support media change - "video_load" event

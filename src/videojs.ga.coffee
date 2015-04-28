@@ -32,7 +32,10 @@ videojs.plugin 'ga', (options = {}) ->
   eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player'
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   defaultLabel = options.eventLabel || dataSetupOptions.eventLabel
-
+  
+  #override the send beacon method - in our case, we need to do data layer pushes
+  sendbeaconOverride = options.sendbeaconOverride || false
+	
   # init a few variables
   percentsAlreadyTracked = []
   startTracked = false
@@ -125,7 +128,7 @@ videojs.plugin 'ga', (options = {}) ->
       for percent in [0..99] by percentsPlayedInterval
         if percentPlayed >= percent && percent not in percentsAlreadyTracked
 
-          if "percentsPlayed" in eventsToTrack && percentPlayed != 0
+          if "percent_played" in eventsToTrack && percentPlayed != 0
             sendbeacon( getEventName('percent_played'), true, percent )
 
           if percentPlayed > 0
@@ -190,12 +193,14 @@ videojs.plugin 'ga', (options = {}) ->
     if @isFullscreen?() || @isFullScreen?()
       sendbeacon( getEventName('fullscreen_enter'), false, currentTime )
     else
-      sendbeacon( getEventName('fullscreen_enter'), false, currentTime )
+      sendbeacon( getEventName('fullscreen_exit'), false, currentTime )
     return
 
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
-    if window.ga
+    if sendbeaconOverride
+      sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
+    else if window.ga
       ga 'send', 'event',
         'eventCategory' 	: eventCategory
         'eventAction'		  : action
@@ -215,7 +220,10 @@ videojs.plugin 'ga', (options = {}) ->
     else
       href = window.location.href
       iframe = 0
-    if window.ga
+      
+		if sendbeaconOverride
+      sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
+    else if window.ga
       ga 'send', 'event',
         'eventCategory' 	: eventCategory
         'eventAction'		  : getEventName('player_load')
