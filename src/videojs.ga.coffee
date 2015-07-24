@@ -148,7 +148,7 @@ videojs.plugin 'ga', (options = {}) ->
 
   end = ->
     if !isInAdState( player ) && !endTracked
-      sendbeacon( 'end', true )
+      sendbeacon( getEventName('end'), true )
       endTracked = true
     return
 
