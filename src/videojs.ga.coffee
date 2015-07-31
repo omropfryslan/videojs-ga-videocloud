@@ -8,7 +8,8 @@
 
 videojs.plugin 'ga', (options = {}) ->
 
-  referrer = new URL(document.referrer)
+  referrer = document.createElement('a')
+  referrer.href = document.referrer
   if (self != top && window.location.host == 'preview-players.brightcove.net' && referrer.hostname = 'studio.brightcove.com')
     videojs.log('Google analytics plugin will not track events in Video Cloud Studio')
     return
