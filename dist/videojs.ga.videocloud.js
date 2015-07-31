@@ -12,7 +12,7 @@
     if (options == null) {
       options = {};
     }
-    referrer = docuemnt.createElement('a');
+    referrer = document.createElement('a');
     referrer.href = document.referrer;
     if (self !== top && window.location.host === 'preview-players.brightcove.net' && (referrer.hostname = 'studio.brightcove.com')) {
       videojs.log('Google analytics plugin will not track events in Video Cloud Studio');
