@@ -1,25 +1,25 @@
 # Google Analytics for Brightcove player
 
-Google Analytics plugin for the next generation Brightcove player.
+Google Analytics plugin for the Brightcove player.
 
 *Note this is not compatible with the Brightcove Smart Player which uses a different plugin architecture and API.*
 
-This plugin was forked from the open source plugin written for video.js [videojs.ga](https://github.com/mickey/videojs-ga). Main changes from the original:
+This plugin was forked from the open source plugin written for video.js [videojs.ga](https://github.com/mickey/videojs-ga) to add changes specific to the Brightcove Player. Main changes from the original:
 
-- The video ID and name are read from the player and tracked as the event label
-- If the player is in an iframe embed or loaded directly on `(preview-)players.brightcove.net` *and* a tracker is set in the plugin options, the Google universal analytics script will be loaded by the plugin. If the in page embed is used Google Analytics must be separately loaded on the page before the player, as with the original videojs-ga.
+- The video ID and name are read from the player and tracked as the event label.
+- Works with the standard (iframe) embed and direct player links: If a tracker is set in the plugin options, the Google universal analytics script will be loaded.
 - Event names tracked are those used by the Smart Player plugins, where applicable. Event names can be customised / localised with plugin options.
 - The plugin will not track events when the player is viewed in the Video Cloud Studio.
 
 ## Getting Started
 * Download the plugin and place on your server.
+
+### Studio configuration
 * Edit the player configuration in the [Players Module of Video Cloud Studio](https://studio.brightcove.com/products/videocloud/players).
 * Under _Plugins>JavaScript_, add the URL to the plugin to the player configuration and click +.
 * Under _Plugins>Name, Options (JSON)_, enter `ga` as the name and click `+`.
 
-If you want to use the in-page embed only, this is enough, but **you must ensure that Google Analytics is loaded on the page before the player**.
-
-If you want use the iframe embed or direct player link, you need to also add the tracker to the plugin configuration under _Plugins>Name, Options (JSON)_:
+If you want use the standard (iframe) embed, you need to also add the tracker to the plugin configuration under _Plugins>Name, Options (JSON)_:
 
 ```json
 {
@@ -34,6 +34,14 @@ You can configure the plugin with the [player management API](http://docs.bright
 ```bash
 curl --header "Content-Type: application/json" --user $EMAIL --request PATCH --data '{"scripts":["http://example.com/videojs.ga.videocloud.js"],"plugins":[{"name":"ga","options":{"tracker":"UA-1234567-8","eventNames":{"play":"Wiedergabe"}}}]}' https://players.api.brightcove.com/v1/accounts/$ACCOUNT_ID/players/$PLAYER_ID/configuration
 ```
+
+### Standard vs Advanced Embed
+
+If you use the standard (iframe) embed, make sure you include the tracker in the player configuration.
+
+If you use the advanced (in-page) embed, the player will track events to the GA tracker on the page. That tracker must load before the player.
+
+By using the embed the events are tracked in context with the rest of the visitor's interactions with the page.
 
 ### Classic and Universal Analytics
 
@@ -56,13 +64,13 @@ Provide options to the plugin in the player configuraiton using `ga` as the name
 
 The following options are supported:
 
-####tracker
+#### tracker
 
 If set, this tracker code will be used for iframe embeds and the direct player URL. This is not used for in-page embeds
 
 **default:** Not set
 
-####eventNames
+#### eventNames
 
 Override or localise the names of the event actions.
 
@@ -86,19 +94,19 @@ Override or localise the names of the event actions.
 }
 ```
 
-####eventCategory
+#### eventCategory
 
 This is the ```category``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
 
 **default:** ```'Brightcove Player'```
 
-####eventLabel
+#### eventLabel
 
 This is the ```label``` sent to GA. If you don't know what it is please check [GA's doc](https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide)
 
 **default:** `VIDEO_ID | VIDEO_NAME`.
 
-####eventsToTrack
+#### eventsToTrack
 
 The events you want to track. For example `start` (playback started for the first time) and `end` are probably more interesting than `play` and `pause`.
 
@@ -113,27 +121,25 @@ The events you want to track. For example `start` (playback started for the firs
 * `start` Playback has started. Once per video load.
 * `end` Playback has completed. Once per video load.
 
-####percentsPlayedInterval
+#### percentsPlayedInterval
 
 This options goes with the ```percents_played``` event. Every ```percentsPlayedInterval``` percents an event will be sent to GA.
 
 **default:** 10
 
-###debug
+### debug
 
 If set to false, console logs will be omited
 **default:** ```false```
 
-####sendbeaconOverride
-In the event you want to do something custom for all tracked events, use this option to pass a callback function to the plugin. The callback will have access to the following variables and will **override the plugins native tracking methods**:
+#### sendbeaconOverride
+In the event you want to do something custom for all tracked events, use this option to pass a callback function to the plugin. The callback will have access to the following variables and will **override the plugin's native tracking methods**:
 * `eventCategorty`
 * `action`
 * `eventLabel`
 * `value`
 * `nonInteraction`
 
-
 ## TODO
 
-- [x] Support media change - "video_load" event
 - [ ] Support ad events
