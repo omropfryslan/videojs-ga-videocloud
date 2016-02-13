@@ -119,6 +119,11 @@ This options goes with the ```percents_played``` event. Every ```percentsPlayedI
 
 **default:** 10
 
+###debug
+
+If set to false, console logs will be omited
+**default:** ```false```
+
 ####sendbeaconOverride
 In the event you want to do something custom for all tracked events, use this option to pass a callback function to the plugin. The callback will have access to the following variables and will **override the plugins native tracking methods**:
 * `eventCategorty`

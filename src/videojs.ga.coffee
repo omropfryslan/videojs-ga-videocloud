@@ -37,6 +37,9 @@ videojs.plugin 'ga', (options = {}) ->
   #override the send beacon method - in our case, we need to do data layer pushes
   sendbeaconOverride = options.sendbeaconOverride || false
 
+  # if debug isn't specified
+  options.debug = options.debug || false
+
   # init a few variables
   percentsAlreadyTracked = []
   startTracked = false
@@ -211,8 +214,9 @@ videojs.plugin 'ga', (options = {}) ->
         'nonInteraction'	: nonInteraction
     else if window._gaq
       _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction])
-    else
+    else if options.debug
       videojs.log("Google Analytics not detected")
+
     return
 
   if "player_load" in eventsToTrack
@@ -248,4 +252,5 @@ videojs.plugin 'ga', (options = {}) ->
     @on("resize", resize) if "resize" in eventsToTrack
     @on("error", error) if "error" in eventsToTrack
     @on("fullscreenchange", fullscreen) if "fullscreen" in eventsToTrack
-  return
+
+  return 'sendbeacon': sendbeacon

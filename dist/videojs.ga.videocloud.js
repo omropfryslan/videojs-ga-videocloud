@@ -1,6 +1,7 @@
 /*
-* videojs-ga - v0.4.1 - 2015-08-10
-* Copyright (c) 2015 Michael Bensoussan
+* videojs-ga-videocloud - v0.4.2 - 2016-02-13
+* Based on videojs-ga 0.4.2
+* Copyright (c) 2016 Michael Bensoussan
 * Licensed MIT
 */
 (function() {
@@ -32,6 +33,7 @@
     eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Brightcove Player';
     defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
     sendbeaconOverride = options.sendbeaconOverride || false;
+    options.debug = options.debug || false;
     percentsAlreadyTracked = [];
     startTracked = false;
     endTracked = false;
@@ -208,7 +210,7 @@
         });
       } else if (window._gaq) {
         _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
-      } else {
+      } else if (options.debug) {
         videojs.log("Google Analytics not detected");
       }
     };
@@ -264,6 +266,9 @@
         return this.on("fullscreenchange", fullscreen);
       }
     });
+    return {
+      'sendbeacon': sendbeacon
+    };
   });
 
 }).call(this);
