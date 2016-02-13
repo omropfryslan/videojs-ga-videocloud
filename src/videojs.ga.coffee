@@ -10,7 +10,7 @@ videojs.plugin 'ga', (options = {}) ->
 
   referrer = document.createElement('a')
   referrer.href = document.referrer
-  if (self != top && window.location.host == 'preview-players.brightcove.net' && referrer.hostname = 'studio.brightcove.com')
+  if (self != top && window.location.host == 'preview-players.brightcove.net' && referrer.hostname == 'studio.brightcove.com')
     videojs.log('Google analytics plugin will not track events in Video Cloud Studio')
     return
 
@@ -94,9 +94,8 @@ videojs.plugin 'ga', (options = {}) ->
         m.parentNode.insertBefore a, m
       ) window, document, "script", "//www.google-analytics.com/analytics.js", "ga"
       ga('create', tracker, 'auto')
-      ga('require', 'displayfeatures');
+      ga('require', 'displayfeatures')
 
-  # get ad state of player
   adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/
   isInAdState = ( player ) =>
     return adStateRegex.test( player.el().className )
@@ -195,7 +194,7 @@ videojs.plugin 'ga', (options = {}) ->
 
   fullscreen = ->
     currentTime = Math.round(@currentTime())
-    if @isFullscreen?() || @isFullScreen?()
+    if @isFullscreen()
       sendbeacon( getEventName('fullscreen_enter'), false, currentTime )
     else
       sendbeacon( getEventName('fullscreen_exit'), false, currentTime )
@@ -207,11 +206,11 @@ videojs.plugin 'ga', (options = {}) ->
       sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
     else if window.ga
       ga 'send', 'event',
-        'eventCategory' 	: eventCategory
-        'eventAction'		  : action
-        'eventLabel'		  : eventLabel
+        'eventCategory'   : eventCategory
+        'eventAction'      : action
+        'eventLabel'      : eventLabel
         'eventValue'      : value
-        'nonInteraction'	: nonInteraction
+        'nonInteraction'  : nonInteraction
     else if window._gaq
       _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction])
     else if options.debug
@@ -227,15 +226,15 @@ videojs.plugin 'ga', (options = {}) ->
       href = window.location.href
       iframe = 0
 
-		if sendbeaconOverride
+    if sendbeaconOverride
       sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
     else if window.ga
       ga 'send', 'event',
-        'eventCategory' 	: eventCategory
-        'eventAction'		  : getEventName('player_load')
-        'eventLabel'		  : href
+        'eventCategory'   : eventCategory
+        'eventAction'      : getEventName('player_load')
+        'eventLabel'      : href
         'eventValue'      : iframe
-        'nonInteraction'	: true
+        'nonInteraction'  : true
     else if window._gaq
       _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false])
     else

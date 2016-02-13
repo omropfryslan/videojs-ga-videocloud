@@ -15,7 +15,7 @@
     }
     referrer = document.createElement('a');
     referrer.href = document.referrer;
-    if (self !== top && window.location.host === 'preview-players.brightcove.net' && (referrer.hostname = 'studio.brightcove.com')) {
+    if (self !== top && window.location.host === 'preview-players.brightcove.net' && referrer.hostname === 'studio.brightcove.com') {
       videojs.log('Google analytics plugin will not track events in Video Cloud Studio');
       return;
     }
@@ -191,7 +191,7 @@
     fullscreen = function() {
       var currentTime;
       currentTime = Math.round(this.currentTime());
-      if ((typeof this.isFullscreen === "function" ? this.isFullscreen() : void 0) || (typeof this.isFullScreen === "function" ? this.isFullScreen() : void 0)) {
+      if (this.isFullscreen()) {
         sendbeacon(getEventName('fullscreen_enter'), false, currentTime);
       } else {
         sendbeacon(getEventName('fullscreen_exit'), false, currentTime);
@@ -222,21 +222,21 @@
         href = window.location.href;
         iframe = 0;
       }
-    }
-    if (sendbeaconOverride) {
-      sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
-    } else if (window.ga) {
-      ga('send', 'event', {
-        'eventCategory': eventCategory,
-        'eventAction': getEventName('player_load'),
-        'eventLabel': href,
-        'eventValue': iframe,
-        'nonInteraction': true
-      });
-    } else if (window._gaq) {
-      _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
-    } else {
-      videojs.log("Google Analytics not detected");
+      if (sendbeaconOverride) {
+        sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
+      } else if (window.ga) {
+        ga('send', 'event', {
+          'eventCategory': eventCategory,
+          'eventAction': getEventName('player_load'),
+          'eventLabel': href,
+          'eventValue': iframe,
+          'nonInteraction': true
+        });
+      } else if (window._gaq) {
+        _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
+      } else {
+        videojs.log("Google Analytics not detected");
+      }
     }
     this.ready(function() {
       this.on("loadedmetadata", loaded);
