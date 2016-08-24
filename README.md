@@ -66,9 +66,15 @@ The following options are supported:
 
 #### tracker
 
-If set, this tracker code will be used for iframe embeds and the direct player URL. This is not used for in-page embeds
+- If set, this tracker code will be used for iframe embeds and the direct player URL.
+- If set and `trackerName` is not set on an in-page embed, this is not used.
+- If set and `trackerName` is set on an in-page embed, this is used for the named tracker.
 
 **default:** Not set
+
+### trackerName
+
+If set, use this as the [tracker name](https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers).
 
 #### eventNames
 
