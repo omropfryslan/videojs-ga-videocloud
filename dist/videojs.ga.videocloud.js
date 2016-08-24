@@ -35,7 +35,10 @@
     sendbeaconOverride = options.sendbeaconOverride || false;
     options.debug = options.debug || false;
     options.trackerName = options.trackerName || null;
-    trackerName = options.namedTracker + '.' || '';
+    trackerName = '';
+    if (typeof options.trackerName === 'string') {
+      trackerName = options.trackerName + '.';
+    }
     percentsAlreadyTracked = [];
     startTracked = false;
     endTracked = false;

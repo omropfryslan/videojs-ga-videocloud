@@ -43,7 +43,9 @@ videojs.plugin 'ga', (options = {}) ->
   # if a named tracker should be used
   options.trackerName = options.trackerName || null
 
-  trackerName = options.namedTracker + '.' || ''
+  trackerName = ''
+  if typeof options.trackerName == 'string'
+    trackerName = options.trackerName + '.'
 
   # init a few variables
   percentsAlreadyTracked = []
