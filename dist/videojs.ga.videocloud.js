@@ -34,7 +34,7 @@
     defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
     sendbeaconOverride = options.sendbeaconOverride || false;
     options.debug = options.debug || false;
-    options.namedTracker = options.namedTracker || null;
+    options.trackerName = options.trackerName || null;
     trackerName = options.namedTracker + '.' || '';
     percentsAlreadyTracked = [];
     startTracked = false;
@@ -86,7 +86,7 @@
           a.src = g;
           return m.parentNode.insertBefore(a, m);
         })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
-        ga('create', tracker, 'auto', options.namedTracker);
+        ga('create', tracker, 'auto', options.trackerName);
         ga(trackerName + 'require', 'displayfeatures');
       }
     }

@@ -41,7 +41,7 @@ videojs.plugin 'ga', (options = {}) ->
   options.debug = options.debug || false
 
   # if a named tracker should be used
-  options.namedTracker = options.namedTracker || null
+  options.trackerName = options.trackerName || null
 
   trackerName = options.namedTracker + '.' || ''
 
@@ -98,7 +98,7 @@ videojs.plugin 'ga', (options = {}) ->
         a.src = g
         m.parentNode.insertBefore a, m
       ) window, document, "script", "//www.google-analytics.com/analytics.js", "ga"
-      ga('create', tracker, 'auto', options.namedTracker)
+      ga('create', tracker, 'auto', options.trackerName)
       ga(trackerName + 'require', 'displayfeatures')
 
   adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/
