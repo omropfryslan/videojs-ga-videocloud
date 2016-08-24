@@ -1,5 +1,5 @@
 /*
-* videojs-ga-videocloud - v0.4.2 - 2016-02-13
+* videojs-ga-videocloud - v0.4.2 - 2016-08-24
 * Based on videojs-ga 0.4.2
 * Copyright (c) 2016 Michael Bensoussan
 * Licensed MIT
@@ -34,6 +34,7 @@
     defaultLabel = options.eventLabel || dataSetupOptions.eventLabel;
     sendbeaconOverride = options.sendbeaconOverride || false;
     options.debug = options.debug || false;
+    options.namedTracker = options.namedTracker || null;
     percentsAlreadyTracked = [];
     startTracked = false;
     endTracked = false;
@@ -69,7 +70,7 @@
       }
       return name;
     };
-    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net') {
+    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net' || options.namedTracker) {
       tracker = options.tracker || dataSetupOptions.tracker;
       if (tracker) {
         (function(i, s, o, g, r, a, m) {
@@ -84,7 +85,7 @@
           a.src = g;
           return m.parentNode.insertBefore(a, m);
         })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
-        ga('create', tracker, 'auto');
+        ga('create', tracker, 'auto', options.namedTracker);
         ga('require', 'displayfeatures');
       }
     }
@@ -198,10 +199,16 @@
       }
     };
     sendbeacon = function(action, nonInteraction, value) {
+      var send;
+      if (options.namedTracker) {
+        send = options.namedTracker + '.send';
+      } else {
+        send = 'send';
+      }
       if (sendbeaconOverride) {
         sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
       } else if (window.ga) {
-        ga('send', 'event', {
+        ga(send, 'event', {
           'eventCategory': eventCategory,
           'eventAction': action,
           'eventLabel': eventLabel,
@@ -225,7 +232,7 @@
       if (sendbeaconOverride) {
         sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
       } else if (window.ga) {
-        ga('send', 'event', {
+        ga(send, 'event', {
           'eventCategory': eventCategory,
           'eventAction': getEventName('player_load'),
           'eventLabel': href,
