@@ -226,28 +226,6 @@ videojs.plugin 'ga', (options = {}) ->
 
     return
 
-  if "player_load" in eventsToTrack
-    unless self == top
-      href = document.referrer
-      iframe = 1
-    else
-      href = window.location.href
-      iframe = 0
-
-    if sendbeaconOverride
-      sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
-    else if window.ga
-      ga trackerName + 'send', 'event',
-        'eventCategory'   : eventCategory
-        'eventAction'      : getEventName('player_load')
-        'eventLabel'      : href
-        'eventValue'      : iframe
-        'nonInteraction'  : true
-    else if window._gaq
-      _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false])
-    else
-      videojs.log("Google Analytics not detected")
-
   @ready ->
     @on("loadedmetadata", loaded) # use loadstart?
     @on("timeupdate", timeupdate)
@@ -259,5 +237,27 @@ videojs.plugin 'ga', (options = {}) ->
     @on("resize", resize) if "resize" in eventsToTrack
     @on("error", error) if "error" in eventsToTrack
     @on("fullscreenchange", fullscreen) if "fullscreen" in eventsToTrack
+
+    if "player_load" in eventsToTrack
+      unless self == top
+        href = document.referrer
+        iframe = 1
+      else
+        href = window.location.href
+        iframe = 0
+
+      if sendbeaconOverride
+        sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
+      else if window.ga
+        ga trackerName + 'send', 'event',
+          'eventCategory'   : eventCategory
+          'eventAction'      : getEventName('player_load')
+          'eventLabel'      : href
+          'eventValue'      : iframe
+          'nonInteraction'  : true
+      else if window._gaq
+        _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false])
+      else
+        videojs.log("Google Analytics not detected")
 
   return 'sendbeacon': sendbeacon

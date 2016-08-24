@@ -8,7 +8,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, trackerName, volumeChange,
+    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, trackerName, volumeChange,
       _this = this;
     if (options == null) {
       options = {};
@@ -219,31 +219,8 @@
         videojs.log("Google Analytics not detected");
       }
     };
-    if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
-      if (self !== top) {
-        href = document.referrer;
-        iframe = 1;
-      } else {
-        href = window.location.href;
-        iframe = 0;
-      }
-      if (sendbeaconOverride) {
-        sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
-      } else if (window.ga) {
-        ga(trackerName + 'send', 'event', {
-          'eventCategory': eventCategory,
-          'eventAction': getEventName('player_load'),
-          'eventLabel': href,
-          'eventValue': iframe,
-          'nonInteraction': true
-        });
-      } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
-      } else {
-        videojs.log("Google Analytics not detected");
-      }
-    }
     this.ready(function() {
+      var href, iframe;
       this.on("loadedmetadata", loaded);
       this.on("timeupdate", timeupdate);
       if (__indexOf.call(eventsToTrack, "end") >= 0) {
@@ -268,7 +245,31 @@
         this.on("error", error);
       }
       if (__indexOf.call(eventsToTrack, "fullscreen") >= 0) {
-        return this.on("fullscreenchange", fullscreen);
+        this.on("fullscreenchange", fullscreen);
+      }
+      if (__indexOf.call(eventsToTrack, "player_load") >= 0) {
+        if (self !== top) {
+          href = document.referrer;
+          iframe = 1;
+        } else {
+          href = window.location.href;
+          iframe = 0;
+        }
+        if (sendbeaconOverride) {
+          return sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
+        } else if (window.ga) {
+          return ga(trackerName + 'send', 'event', {
+            'eventCategory': eventCategory,
+            'eventAction': getEventName('player_load'),
+            'eventLabel': href,
+            'eventValue': iframe,
+            'nonInteraction': true
+          });
+        } else if (window._gaq) {
+          return _gaq.push(['_trackEvent', eventCategory, getEventName('player_load'), href, iframe, false]);
+        } else {
+          return videojs.log("Google Analytics not detected");
+        }
       }
     });
     return {
