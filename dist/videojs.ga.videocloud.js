@@ -8,7 +8,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, volumeChange,
+    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, send, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, volumeChange,
       _this = this;
     if (options == null) {
       options = {};
@@ -70,7 +70,7 @@
       }
       return name;
     };
-    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net' || options.namedTracker) {
+    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net' || typeof options.namedTracker === 'string') {
       tracker = options.tracker || dataSetupOptions.tracker;
       if (tracker) {
         (function(i, s, o, g, r, a, m) {
@@ -198,13 +198,12 @@
         sendbeacon(getEventName('fullscreen_exit'), false, currentTime);
       }
     };
+    if (options.namedTracker) {
+      send = options.namedTracker + '.send';
+    } else {
+      send = 'send';
+    }
     sendbeacon = function(action, nonInteraction, value) {
-      var send;
-      if (options.namedTracker) {
-        send = options.namedTracker + '.send';
-      } else {
-        send = 'send';
-      }
       if (sendbeaconOverride) {
         sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
       } else if (window.ga) {

@@ -79,7 +79,7 @@ videojs.plugin 'ga', (options = {}) ->
     return name
 
   # load ga script if in iframe and tracker option is set
-  if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net' || options.namedTracker
+  if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net' || typeof options.namedTracker == 'string' 
     tracker = options.tracker || dataSetupOptions.tracker
     if tracker
       ((i, s, o, g, r, a, m) ->
@@ -203,13 +203,13 @@ videojs.plugin 'ga', (options = {}) ->
       sendbeacon( getEventName('fullscreen_exit'), false, currentTime )
     return
 
+  if options.namedTracker
+    send = options.namedTracker + '.send'
+  else
+    send = 'send'
+
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
-
-    if options.namedTracker
-      send = options.namedTracker + '.send'
-    else
-      send = 'send'
 
     if sendbeaconOverride
       sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
