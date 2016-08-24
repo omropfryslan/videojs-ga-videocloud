@@ -43,6 +43,8 @@ videojs.plugin 'ga', (options = {}) ->
   # if a named tracker should be used
   options.namedTracker = options.namedTracker || null
 
+  trackerName = options.namedTracker + '.' || ''
+
   # init a few variables
   percentsAlreadyTracked = []
   startTracked = false
@@ -79,7 +81,7 @@ videojs.plugin 'ga', (options = {}) ->
     return name
 
   # load ga script if in iframe and tracker option is set
-  if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net' || typeof options.namedTracker == 'string' 
+  if window.location.host == 'players.brightcove.net' || window.location.host == 'preview-players.brightcove.net' || trackerName != '' 
     tracker = options.tracker || dataSetupOptions.tracker
     if tracker
       ((i, s, o, g, r, a, m) ->
@@ -97,7 +99,7 @@ videojs.plugin 'ga', (options = {}) ->
         m.parentNode.insertBefore a, m
       ) window, document, "script", "//www.google-analytics.com/analytics.js", "ga"
       ga('create', tracker, 'auto', options.namedTracker)
-      ga('require', 'displayfeatures')
+      ga(trackerName + 'require', 'displayfeatures')
 
   adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/
   isInAdState = ( player ) =>
@@ -203,18 +205,13 @@ videojs.plugin 'ga', (options = {}) ->
       sendbeacon( getEventName('fullscreen_exit'), false, currentTime )
     return
 
-  if options.namedTracker
-    send = options.namedTracker + '.send'
-  else
-    send = 'send'
-
   sendbeacon = ( action, nonInteraction, value ) ->
     # videojs.log action, " ", nonInteraction, " ", value
 
     if sendbeaconOverride
       sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction)
     else if window.ga
-      ga send, 'event',
+      ga trackerName + 'send', 'event',
         'eventCategory'   : eventCategory
         'eventAction'      : action
         'eventLabel'      : eventLabel
@@ -238,7 +235,7 @@ videojs.plugin 'ga', (options = {}) ->
     if sendbeaconOverride
       sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true)
     else if window.ga
-      ga send, 'event',
+      ga trackerName + 'send', 'event',
         'eventCategory'   : eventCategory
         'eventAction'      : getEventName('player_load')
         'eventLabel'      : href

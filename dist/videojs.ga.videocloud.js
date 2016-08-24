@@ -8,7 +8,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, send, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, volumeChange,
+    var adStateRegex, currentVideo, dataSetupOptions, defaultLabel, defaultsEventsToTrack, end, endTracked, error, eventCategory, eventLabel, eventNames, eventsToTrack, fullscreen, getEventName, href, iframe, isInAdState, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, player, referrer, resize, seekEnd, seekStart, seeking, sendbeacon, sendbeaconOverride, start, startTracked, timeupdate, tracker, trackerName, volumeChange,
       _this = this;
     if (options == null) {
       options = {};
@@ -35,6 +35,7 @@
     sendbeaconOverride = options.sendbeaconOverride || false;
     options.debug = options.debug || false;
     options.namedTracker = options.namedTracker || null;
+    trackerName = options.namedTracker + '.' || '';
     percentsAlreadyTracked = [];
     startTracked = false;
     endTracked = false;
@@ -70,7 +71,7 @@
       }
       return name;
     };
-    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net' || typeof options.namedTracker === 'string') {
+    if (window.location.host === 'players.brightcove.net' || window.location.host === 'preview-players.brightcove.net' || trackerName !== '') {
       tracker = options.tracker || dataSetupOptions.tracker;
       if (tracker) {
         (function(i, s, o, g, r, a, m) {
@@ -86,7 +87,7 @@
           return m.parentNode.insertBefore(a, m);
         })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
         ga('create', tracker, 'auto', options.namedTracker);
-        ga('require', 'displayfeatures');
+        ga(trackerName + 'require', 'displayfeatures');
       }
     }
     adStateRegex = /(\s|^)vjs-ad-(playing|loading)(\s|$)/;
@@ -198,16 +199,11 @@
         sendbeacon(getEventName('fullscreen_exit'), false, currentTime);
       }
     };
-    if (options.namedTracker) {
-      send = options.namedTracker + '.send';
-    } else {
-      send = 'send';
-    }
     sendbeacon = function(action, nonInteraction, value) {
       if (sendbeaconOverride) {
         sendbeaconOverride(eventCategory, action, eventLabel, value, nonInteraction);
       } else if (window.ga) {
-        ga(send, 'event', {
+        ga(trackerName + 'send', 'event', {
           'eventCategory': eventCategory,
           'eventAction': action,
           'eventLabel': eventLabel,
@@ -231,7 +227,7 @@
       if (sendbeaconOverride) {
         sendbeaconOverride(eventCategory, getEventName('player_load'), href, iframe, true);
       } else if (window.ga) {
-        ga(send, 'event', {
+        ga(trackerName + 'send', 'event', {
           'eventCategory': eventCategory,
           'eventAction': getEventName('player_load'),
           'eventLabel': href,
