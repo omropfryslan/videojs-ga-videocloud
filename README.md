@@ -1,4 +1,5 @@
-# Google Analytics for Brightcove player
+# Google Analytics for videojs 6
+### Basic port of the Brightcove player
 
 Google Analytics plugin for the Brightcove player.
 
