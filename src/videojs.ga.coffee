@@ -6,7 +6,7 @@
 # Licensed under the MIT license.
 ##
 
-videojs.plugin 'ga', (options = {}) ->
+videojs.registerPlugin 'ga', (options = {}) ->
 
   referrer = document.createElement('a')
   referrer.href = document.referrer
@@ -18,8 +18,8 @@ videojs.plugin 'ga', (options = {}) ->
 
   # this loads options from the data-setup attribute of the video tag
   dataSetupOptions = {}
-  if @options()["data-setup"]
-    parsedOptions = JSON.parse(@options()["data-setup"])
+  if @options_["data-setup"]
+    parsedOptions = JSON.parse(@options_["data-setup"])
     dataSetupOptions = parsedOptions.ga if parsedOptions.ga
 
   defaultsEventsToTrack = [
